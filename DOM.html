@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping cart</title>
+
+    <style>
+        /* html, body {
+            margin:0;
+            padding: 0;
+        } */
+
+        #message {
+            margin:20px 0px;
+            color:red;
+        }
+        body {
+            /* margin:0 auto; */
+            padding:20px 10%;
+            /* background-color: grey; */
+        }
+        .market, .basket {
+            background-color: white;
+            padding:20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 
+                        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            width:100%;
+            min-height:400px;
+            /* border:1px solid red; */
+        }
+        .market {
+
+        }
+        .basket {
+
+        }
+
+       
+
+        /* Горизонтальные разделители таблицы */
+        td, th {
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Таблица при наведении */
+        tr:hover {
+            background-color: #f5f5f5
+        }
+
+        /* Полосатая таблица */
+        tr:nth-child(even) {
+            background-color: #f2f2f2
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            /* border:4px red solid; */
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            height: 30px;
+            /* Отступы в таблице */
+            padding:7px;
+            text-align:left;
+            vertical-align: middle;
+
+        }
+
+        .buttonsRow {
+            margin:20px 0px;
+        }
+        .buttonsRow button {
+            min-width: 120px;
+        }
+    </style>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="market" >
+                    <h1>Market</h1>
+                    <p>Products available in the market</p>
+
+                    <div class="row buttonsRow">
+                        <div class="col-sm-12">
+                            <h2>Operations</h2>                
+                            <button id="addItemsToTheStore" class="btn btn-success">Add new product</button>
+                            <button class="btn btn-danger" onclick="this.innerHTML='Coming soon..'; ">Empty market</button>
+                        </div>
+                        <div class="col-sm-12" id="message" style="display: none;">
+
+                        </div>
+                    </div>
+                    <!-- childNodes[0] == firstChild  -->
+                    <table>
+                        <tbody id="tableMarket">
+                            <tr>
+                                <th>Product name</th>
+                                <th>Amount</th>
+                                <th>Unit Price</th>
+                            </tr>
+                            <!-- <tr>
+                                <td>Apple</td>
+                                <td>20</td>
+                                <td>5</td>
+                            </tr> -->
+                            
+                        </tbody>
+
+                    </table>
+                    
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="basket" id="basket">
+                    <h1>My Basket</h1>
+                    <p>Products available in the basket</p>
+                    <div class="row buttonsRow" >
+                        <div class="col-sm-12">
+                            <h2>Basket Operations</h2>                
+                            <button class="btn btn-success" id="letsBuySomething">Buy</button>
+                            <button class="btn btn-danger" id="pay" >Pay</button>
+                        
+                        </div>
+                    </div>
+                    <table>
+                        <tbody id="tableBasket">
+                            <tr>
+                                <th>Product name</th>
+                                <th>Amount</th>
+                                <th>Cost</th>
+    
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+
+    <script>
+        "use strict";
+
+        /* 
+            Объектхои store, basket бояд аз обектхои дохили иборат бошанд;
+            Хар як товаре ки аз тарафи админ илова шавад ба намуди зерин бошад
+                seb : { price: 12, itemAmount: 20}
+        
+        */
+        let store = {};
+        let id = 0;
+        // let store = {
+        //     seb : { price: 12, amount: 20},
+        //     angur : { price: 10, amount: 15},
+        //     shaftolu : { price: 8, amount: 25},
+        // };
+        // // Accessing properties 
+        // store[seb][price] == 12
+        let basket = {};
+        let balance = 1000;
+        document.getElementById('addItemsToTheStore').addEventListener('click', addItemsToTheStore);
+        document.getElementById('letsBuySomething').addEventListener('click', letsBuySomething);
+        document.getElementById('pay').addEventListener('click', pay);
+        
+        
+        
+        // let data = localStorage.getItem("store");
+        // check if data is not empty 
+        // if(data) {
+        //     store = JSON.parse(data); // set the id to the last one in the list
+        //     id = store.length; // load the list to the user interface
+        //     // loadList(store);
+        // } else {
+        //     // if data is empty  
+        //     store = [];
+        //     id = 0;
+        // }
+        // load the items to the user's interface 
+        // function loadList(array){
+        //     array.forEach(function(item){
+        //         addToDo(item.name, item.id, item.done, item.trash);
+        //     });
+        // }
+        
+        while(false) {
+            let action = prompt("\nMARKET MAIN MENU:\n \
+Enter one of below numbers for actions. \n\
+1. Add items to the store \n\
+2. Buy items from the store \n\
+3. Show store \n\
+4. Show basket \n\
+5. Exit \n\
+6. Pay \n\
+\nWhat do you want to do?");
+            // console.log(action);
+
+            if (action == '5'){
+                console.log("Thanks for being with us!");
+                // console.log("Store: ", store );
+                break;
+            }
+            else if (action == '1') {
+                console.log("You have selected 'adding items to the store' ")
+                
+                while(true) {
+                    let confirmChoice = confirm("You want to add or change item?"); 
+                    
+                    if(confirmChoice){
+                        addItemsToTheStore();
+                    } 
+                    else if (!confirmChoice) {
+                        break;
+                    }  
+                }
+            }
+            else if (action == '3') {
+                showItemsinStore();
+            }
+            else if(action == '2') {
+                let helpConfirmation = confirm("Welcome to our supermarket!\n \
+I am a robot, and I can help you what and how much to buy. OK?");
+                if(helpConfirmation) {
+                    letsBuySomething();
+                }
+            }
+            else if (action == '4') {
+                showItemsinBasket();
+            }
+
+            // endifs
+        } // End of main function
+        
+        function itemAvailbe(keyName) {
+
+            if (keyName in store ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function isEmptyString(field) {
+            return (field==''?true:false); 
+        }
+
+        function letsBuySomething() {
+            let itemName;
+            let itemAmount;
+            itemName = prompt("What do you want to buy?");
+                
+            if (!isEmptyString(itemName)){
+                console.log("String is not empty passed!");
+
+                if (itemName == null) {
+                    return;
+                }
+
+
+                if (itemAvailbe(itemName)) {
+                    itemAmount = Number(prompt("How much do you want to buy?"));
+
+                    const tableBasket = document.querySelector('#tableBasket');
+                    const tableMarket = document.querySelector('#tableMarket');
+
+                    if(Number.isInteger(itemAmount)) {
+                        // check if this much exists 
+                        if (itemAmount <= store[itemName]['amount']) {
+                            // reduce the store item amount to 'itemAmount' in the 'store' object 
+                            store[itemName].amount  = store[itemName]['amount'] - itemAmount; //15
+                            // update/show reduced data on table Market when buy 
+                            let rowsOfMTable = tableMarket.querySelectorAll('tr');
+                            for(let i=1; i<rowsOfMTable.length; i++ ) {
+                                if(rowsOfMTable[i].firstChild.innerHTML == itemName) {
+                                    rowsOfMTable[i].childNodes[1].innerHTML = store[itemName].amount;
+                                }
+                            }
+
+                            let itemCost = itemAmount*store[itemName]['price'];
+                            if (itemName in basket) { // if the clinets rebuys the same product
+                                basket[itemName] = {
+                                    amount:basket[itemName]['amount'] + itemAmount,
+                                    price: basket[itemName]['price'] + itemCost, 
+                                };
+
+
+
+                                // Find the item in the table and change its value
+                                let rowsOfMTable = tableBasket.querySelectorAll('tr');
+                                for(let i=1; i<rowsOfMTable.length; i++ ) {
+                                    // alert(rowsOfMTable[i].firstChild.innerHTML);
+                                    if(rowsOfMTable[i].firstChild.innerHTML == itemName) {
+                                        // rowsOfMTable[i].childNodes[0].innerHTML = itemName;
+                                        rowsOfMTable[i].childNodes[1].innerHTML = basket[itemName]['amount'];
+                                        rowsOfMTable[i].childNodes[2].innerHTML = basket[itemName]['price'];
+                                    }
+                                }
+
+
+
+                            }
+                            else {
+                                basket[itemName] = {amount:itemAmount, price:itemCost};
+                                // Create a row and append it to the end of the table 
+                                let tableRow = document.createElement('tr');
+                                
+                                let td1 = document.createElement('td');
+                                let tText = document.createTextNode(itemName);
+                                td1.appendChild(tText);
+
+                                let td2 = document.createElement('td');
+                                tText = document.createTextNode(itemAmount);
+                                td2.appendChild(tText);
+
+                                let td3 = document.createElement('td');
+                                td3.appendChild(document.createTextNode(itemCost));
+
+                                tableRow.appendChild(td1);
+                                tableRow.appendChild(td2);
+                                tableRow.appendChild(td3);
+
+                                tableBasket.appendChild(tableRow);
+                            }
+
+
+                            
+                            alert("Item added to your basket");
+                            // alert(showItemsinBasket());
+
+                        } 
+                        else 
+                        {
+                            alert("We do not have sufficient "+ itemName+" in our store");
+                        }
+
+                    } 
+                    else 
+                    {
+                        alert("Amount must be numeric");
+                    }
+                    
+                } else {
+                    alert("Sorry, we do not have this item in store")
+                }
+            }
+            else if (itemName == null) {
+                return;
+            }
+        }
+
+        // Shows the items of specified objects;
+        function showItemsinStore() {
+            let products = '\n';
+            for (let itemName in store) {
+                products = products + String(itemName) + ': '+ String(store[itemName])+ '\n'; 
+            }
+            alert("Items in store: " + products);
+        }
+
+        function showItemsinBasket() {
+            let products = '\n';
+            for (let itemName in basket) {
+                products = products + String(itemName) + ': '+ String(basket[itemName])+ '\n'; 
+            }
+            alert("Items in basket: " + products);
+        }
+
+        function addItemsToTheStore(){
+            let msgBox = document.getElementById('message');
+            msgBox.style.display = "none";
+            // msgBox.style.visibility = "hidden";
+
+            let itemName = prompt("Enter item name: ");
+            if(itemName === '' || itemName == null) return;
+
+            let itemAmount = Number(prompt("Enter item amount: "));
+            if(Number.isNaN(itemAmount) ){
+                alert('please enter a numerical number');
+                return;
+            } 
+            else if (itemAmount == null ) return;
+            let itemPrice = Number(prompt("Enter item price: "));
+            if(itemPrice === '' || itemPrice == null) return;
+
+            // Table 
+            let tableMarket = document.getElementById("tableMarket");
+            
+            if(itemName in store) { // if the item exists in the table/store
+                store[itemName]= {
+                            amount: store[itemName]['amount']+itemAmount,
+                            price:itemPrice, 
+                            }; 
+                // Find the item in the table and change its value
+                let rowsOfMTable = tableMarket.querySelectorAll('tr');
+                for(let i=1; i<rowsOfMTable.length; i++ ) {
+                    if(rowsOfMTable[i].firstChild.innerHTML == itemName) {
+                        rowsOfMTable[i].childNodes[0].innerHTML = itemName;
+                        rowsOfMTable[i].childNodes[1].innerHTML = store[itemName]['amount'];
+                        rowsOfMTable[i].childNodes[2].innerHTML = store[itemName]['price'];
+                        // rowsOfMTable[i].remove();
+                    }
+                }
+
+            } else {
+                store[itemName]= {
+                                amount: itemAmount,
+                                price:itemPrice, 
+                                }; 
+                // Create a row and append it to the end of the table 
+                let tableRow = document.createElement('tr');
+
+                let td1 = document.createElement('td'); // .innerHTML = itemName;
+                td1.appendChild(document.createTextNode(itemName));
+
+                let td2 = document.createElement('td');
+                td2.appendChild(document.createTextNode(itemAmount));
+
+                let td3 = document.createElement('td');
+                td3.appendChild(document.createTextNode(itemPrice));
+                
+                tableRow.appendChild(td1);
+                tableRow.appendChild(td2);
+                tableRow.appendChild(td3);
+                
+                tableMarket.appendChild(tableRow);
+
+                // const tr =    `<tr>
+                //                     <td>${itemName}</td>
+                //                     <td>${itemAmount}</td>
+                //                     <td>${itemPrice}</td>
+                //                 </tr>
+                //                 `;
+                // const position  = "beforeend"; 
+                // tableMarket.insertAdjacentHTML(position, tr);
+
+            }
+            
+            msgBox.innerHTML = "Your item has been added to the market";
+            msgBox.style.display = "block";
+
+            // localStorage.setItem("store", JSON.stringify(store));
+        }
+
+        function pay() {
+            let totalPay = 0;
+            
+            for(let product in basket) {
+                console.log(product.price);
+                // totalPay = totalPay+Number(product.price);   
+            }
+            console.log("You have paid: ", totalPay);
+
+            if(totalPay <= balance) {
+                balance = balance - totalPay;
+                alert("Payment success! \nYour balance: ", balance)
+            } 
+            else {
+                alert("You do not have sufficient money in your balance :( ");
+            }
+            // let totalPayCell = document.getElementById(tableBasket);
+
+        }
+        
+        console.log("Store: ", store);
+        console.log("Basket: ", basket);
+        // alert("Basket: ", basket);
+
+        // let var1 = 5;
+        // var1 = 6;
+        // var1 = var1+6;
+        // product = prompt() // аз юзер мегирем
+        // itemAmount = prompt() // аз юзер мегирем
+        // Price = prompt() // аз юзер мегирем
+        // store[product] = {amount:itemAmount, price:Price}
+        // console.log(store);
+
+ 
+ </script>
+</body>
+</html>
